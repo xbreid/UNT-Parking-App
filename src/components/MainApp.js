@@ -1,85 +1,172 @@
-/**
- * @flow
- */
-
 import React from 'react';
 import { Button, ScrollView, StatusBar, View, Image, TouchableHighlight,
   TouchableOpacity, Modal, Text } from 'react-native';
 import { SafeAreaView, StackNavigator, TabNavigator } from 'react-navigation';
-
+import Dimensions from 'Dimensions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SampleText from './SampleText';
 import { MapView } from 'expo';
-
 import ImageZoom from 'react-native-image-pan-zoom';
-import ParkingLot from '../images/smart-parking.jpg';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import LocPin from '../images/green-location-pin.png';
+import Lot25 from '../images/Lot25Vec-IOS.psd';
+import Lot123 from '../images/Lot123Vec-IOS.psd';
+import CustomMarker from './CustomMarker';
 
-class ModalExample extends React.Component {
 
-  state = {
-    modalVisible: false,
-  };
+// lot 25 coords
+const lot25 = {
+  latitude: 33.2091237,
+  longitude: -97.1502889,
+};
 
-  setModalVisible(visible) {
-    this.setState({modalVisible: visible});
+// lot 1, 2, 3 coords
+const lot123 = {
+  latitude: 33.2115122,
+  longitude: -97.1494314,
+};
+
+// Time summary screen/class component
+class SelectTime extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      hour: 0,
+      minutes: 0
+    };
+
+    this.handleHourChange = this.handleHourChange.bind(this);
+    this.handleMinuteChange = this.handleMinuteChange.bind(this);
+  }
+
+  handleHourChange(isIncrement) {
+    if (isIncrement) {
+      if (this.state.hour !== 7)
+        this.setState({ hour: this.state.hour + 1});
+    } else {
+      if (this.state.hour !== 0)
+        this.setState({ hour: this.state.hour - 1});
+    }
+  }
+
+  handleMinuteChange(isIncrement) {
+    if (isIncrement) {
+      if (this.state.minutes !== 45)
+        this.setState({ minutes: this.state.minutes + 15});
+    } else {
+      if (this.state.minutes !== 0)
+        this.setState({ minutes: this.state.minutes - 15});
+    }
   }
 
   render() {
-    return (
-      <View style={{marginTop: 22}}>
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={this.state.modalVisible}
-          onRequestClose={() => {alert("Modal has been closed.")}}
-        >
-          <View style={{
-            shadowColor: 'black',
-            marginLeft: 50,
-            marginRight: 50,
-            marginTop: 100,
-            marginBottom: 100,
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            shadowOffset: {
-              width: 0,
-              height: 3
-            },
-            shadowRadius: 5,
-            shadowOpacity: 1.0
-          }}>
-            <View>
-              <Text>Hello World!</Text>
 
-              <TouchableHighlight onPress={() => {
-                this.setModalVisible(!this.state.modalVisible)
-              }}>
-                <Text>Hide Modal</Text>
-              </TouchableHighlight>
+    const styles = {
+      timeHeader: {
+        marginTop: 80,
+        marginBottom: 30,
+        fontSize: 23,
+        fontWeight: 'bold'
+      },
+      container: {
+        backgroundColor: 'white',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      timeBox: {
+        marginTop: 10,
+        marginBottom: 10,
+        width: 125,
+        height: 120,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: 'grey',
+        borderWidth: 1,
+        borderRadius: 2
+      },
+      timeBoxNumber: {
+        fontSize: 30
+      },
+      timeBoxDesc: {
+        fontSize: 12
+      },
+      buttonContainer: {
+        paddingVertical: 15,
+        paddingHorizontal: 60,
+        backgroundColor: '#003700',
+        borderRadius: 2,
+        marginBottom: 10
+      },
+      buttonText: {
+        textAlign: 'center',
+        color: '#FFFFFF',
+        fontWeight: '700',
+        paddingHorizontal: 30,
+        fontSize: 14
+      }
+    };
 
+    return(
+      <View style={styles.container}>
+        <Text style={styles.timeHeader}>{this.state.hour} Hour {this.state.minutes} Minutes</Text>
+        <View style={{ flex: 1, flexDirection: 'row'}}>
+          <View style={{margin: 20, alignItems: 'center'}}>
+            <TouchableOpacity onPress={() => this.handleHourChange(true)}>
+              <Icon name="chevron-circle-up" size={40} color='#006a31' />
+            </TouchableOpacity>
+            <View style={styles.timeBox}>
+              <Text style={styles.timeBoxNumber}> {this.state.hour} </Text>
+              <Text style={styles.timeBoxDesc}> hour(s) </Text>
             </View>
+            <TouchableOpacity onPress={() => this.handleHourChange(false)}>
+              <Icon name="chevron-circle-down" size={40} color='#006a31' />
+            </TouchableOpacity>
           </View>
-        </Modal>
-
-        <TouchableHighlight onPress={() => {
-          this.setModalVisible(true)
-        }}>
-          <Text>Show Modal</Text>
-        </TouchableHighlight>
-
+          <View style={{margin: 20, alignItems: 'center'}}>
+            <TouchableOpacity onPress={() => this.handleMinuteChange(true)}>
+              <Icon name="chevron-circle-up" size={40} color='#006a31' />
+            </TouchableOpacity>
+            <View style={styles.timeBox}>
+              <Text style={styles.timeBoxNumber}> {this.state.minutes} </Text>
+              <Text style={styles.timeBoxDesc}> minutes(s) </Text>
+            </View>
+            <TouchableOpacity onPress={() => this.handleMinuteChange(false)}>
+              <Icon name="chevron-circle-down" size={40} color='#006a31' />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={{ marginTop: 'auto', paddingVertical: 20}}>
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            onPress={() => { this.props.nav.navigate('Home') }}
+          >
+            <Text style={styles.buttonText}> SUBMIT </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
 }
 
-const cords = {
-  latitude: 33.2543416,
-  longitude: -97.15247219999998,
-};
 
+// Image panner screen/component
+class ImagePanner extends React.Component {
+  render() {
+    return(
+      <ImageZoom cropWidth={Dimensions.get('window').width}
+                 cropHeight={Dimensions.get('window').height}
+                 onClick={() => this.props.nav.navigate('SelectTime')}
+                 imageWidth={Dimensions.get('window').width}
+                 imageHeight={this.props.maxHeight ? Dimensions.get('window').height : 300}>
+        <Image style={{width: Dimensions.get('window').width, height: this.props.maxHeight ? Dimensions.get('window').height : 300}}
+               source={this.props.img}/>
+      </ImageZoom>
+    );
+  }
+}
+
+// Example nav screen used on settings screen
 const MyNavScreen = ({ navigation, banner }) => (
   <ScrollView>
     <StatusBar
@@ -87,139 +174,67 @@ const MyNavScreen = ({ navigation, banner }) => (
     />
     <SafeAreaView forceInset={{ horizontal: 'always' }}>
       <SampleText>{banner}</SampleText>
-      <Button
-        onPress={() => navigation.navigate('Profile', { name: 'Jordan' })}
-        title="Open profile screen"
-      />
-      <Button
-        onPress={() => navigation.navigate('NotifSettings')}
-        title="Open notifications screen"
-      />
-      <Button
-        onPress={() => navigation.navigate('SettingsTab')}
-        title="Go to settings tab"
-      />
       <Button onPress={() => navigation.goBack(null)} title="Go back" />
     </SafeAreaView>
   </ScrollView>
 );
 
+// map used on main screen
 const MyMap = ({ navigation, banner }) => (
   <MapView
     style={{ flex: 1 }}
     initialRegion={{
-      latitude: 33.2543416,
-      longitude: -97.15247219999998,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
+      latitude: 33.2091237,
+      longitude: -97.1502889,
+      latitudeDelta: 0.0080,
+      longitudeDelta: 0.0080,
     }}
   >
     <MapView.Marker
-      coordinate={cords}
-      //title='test marker'
-      //description='testing'
-      //onPress={() => navigation.navigate('Profile', { name: 'Jordan' })}
-      onPress={() => navigation.navigate('ParkingLot')}
-    />
+      coordinate={lot25}
+      onPress={() => navigation.navigate('ParkingLot25')}
+    >
+      <CustomMarker lot={'Lot 25'}/>
+    </MapView.Marker>
+    <MapView.Marker
+      coordinate={lot123}
+      onPress={() => navigation.navigate('ParkingLot123')}
+    >
+      <CustomMarker lot={'Lot 1, 2, 3'}/>
+    </MapView.Marker>
   </MapView>
 );
 
-
+// Home screen that uses MyMap component above
 const MyHomeScreen = ({ navigation }) => (
- // <MyNavScreen banner="Home Screen" navigation={navigation} />
   <MyMap banner="Home Screen" navigation={navigation}/>
 );
 
-const ParkingLotScreen = ({ navigation }) => (
-  //<MyNavScreen
-  // banner={`${navigation.state.params.name}s Profile`}
-  // navigation={navigation}
-  ///>
-
+// parking lot 25 screen with image panner component
+const ParkingLot25Screen = ({ navigation }) => (
   <ScrollView maximumZoomScale={5} scrollEnabled={true} minimumZoomScale={1} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
-    <TouchableHighlight onPress={() => navigation.navigate('SelectTime')}>
-      <Image
-        //style={{height: 100, width: 100}}
-        style={{flex: 1, resizeMode: 'cover'}}
-        source={ParkingLot}
-      />
-    </TouchableHighlight>
+      <ImagePanner img={Lot25} maxHeight={true}  nav={navigation}/>
   </ScrollView>
 );
 
-const buttonContainer = {
-  paddingVertical: 5,
-  backgroundColor: '#003700',
-  borderRadius: 2
-};
+// parking lot 1, 2, 3 screen with image panner component
+const ParkingLot123Screen = ({ navigation }) => (
+  //<ScrollView maximumZoomScale={5} scrollEnabled={true} minimumZoomScale={1} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
+    <ImagePanner img={Lot123} maxHeight={false} nav={navigation}/>
+  //</ScrollView>
+);
 
-const buttonText = {
-  textAlign: 'center',
-  color: '#FFFFFF',
-  fontWeight: '700',
-  paddingHorizontal: 30
-};
-
+// select time screen with select time class component
 const SelectTimeScreen = ({ navigation, timeSelectOpen }) => (
-  //<MyNavScreen banner="Time Summary Screen" navigation={navigation} />
-  //<ModalExample/>
-  <View style={{
-    shadowColor: 'black',
-    backgroundColor: 'white',
-    marginLeft: 50,
-    marginRight: 50,
-    marginTop: 100,
-    marginBottom: 100,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowOffset: {
-    width: 0,
-      height: 3
-  },
-  shadowRadius: 5,
-    shadowOpacity: 1.0
-  }}>
-    <Text style={{marginTop: 30}}>1 Hour 30 Minutes</Text>
-    <View style={{ flex: 1, flexDirection: 'row'}}>
-      <View style={{margin: 20, alignItems: 'center'}}>
-        <Icon name="chevron-circle-up" size={20} color='#006a31' />
-        <View style={{marginTop: 10, marginBottom: 10, width: 55, height: 50, justifyContent: 'center', alignItems: 'center', borderColor: 'grey', borderWidth: 1, borderRadius: 2}}>
-          <Text> 1 </Text>
-          <Text style={{ fontSize: 8 }}> hour(s) </Text>
-        </View>
-        <Icon name="chevron-circle-down" size={20} color='#006a31' />
-      </View>
-      <View style={{margin: 20, alignItems: 'center'}}>
-        <Icon name="chevron-circle-up" size={20} color='#006a31' />
-        <View style={{marginTop: 10, marginBottom: 10, width: 55, height: 50, justifyContent: 'center', alignItems: 'center', borderColor: 'grey', borderWidth: 1, borderRadius: 2}}>
-          <Text> 30 </Text>
-          <Text style={{ fontSize: 8 }}> minutes(s) </Text>
-        </View>
-        <Icon name="chevron-circle-down" size={20} color='#006a31' />
-      </View>
-    </View>
-    <View style={{ marginTop: 'auto', paddingVertical: 20}}>
-      <TouchableOpacity
-        style={buttonContainer}
-        onPress={() => { navigation.goBack(null) }}
-      >
-        <Text style={buttonText}>
-          SUBMIT
-        </Text>
-      </TouchableOpacity>
-    </View>
-  </View>
+  <SelectTime nav={navigation}/>
 );
 
-const MyNotificationsSettingsScreen = ({ navigation }) => (
-  <MyNavScreen banner="Notifications Screen" navigation={navigation} />
-);
-
+// setting screen example with mynav
 const MySettingsScreen = ({ navigation }) => (
   <MyNavScreen banner="Settings Screen" navigation={navigation} />
 );
 
+// stack navigator
 const MainTab = StackNavigator({
   Home: {
     screen: MyHomeScreen,
@@ -228,9 +243,16 @@ const MainTab = StackNavigator({
       title: 'Select Location',
     },
   },
-  ParkingLot: {
-    screen: ParkingLotScreen,
-    path: '/parking-lot',
+  ParkingLot25: {
+    screen: ParkingLot25Screen,
+    path: '/parking-lot25',
+    navigationOptions: ({ navigation }) => ({
+      title: `Select a Spot`,
+    }),
+  },
+  ParkingLot123: {
+    screen: ParkingLot123Screen,
+    path: '/parking-lot123',
     navigationOptions: ({ navigation }) => ({
       title: `Select a Spot`,
     }),
@@ -251,12 +273,6 @@ const SettingsTab = StackNavigator({
     navigationOptions: () => ({
       title: 'Settings',
     }),
-  },
-  NotifSettings: {
-    screen: MyNotificationsSettingsScreen,
-    navigationOptions: {
-      title: 'Notifications',
-    },
   },
 });
 
@@ -297,5 +313,6 @@ const MainApp = TabNavigator(
     swipeEnabled: false,
   }
 );
+
 
 export default MainApp;
