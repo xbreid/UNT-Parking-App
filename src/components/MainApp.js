@@ -317,6 +317,8 @@ const SettingsTab = StackNavigator({
     path: '/',
     navigationOptions: () => ({
       title: 'Settings',
+      headerStyle: styles.header,
+      headerTitleStyle: styles.headerTitle
     }),
   },
 });
