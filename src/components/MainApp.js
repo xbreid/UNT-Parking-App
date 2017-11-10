@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, ScrollView, StatusBar, View, Image, TouchableHighlight,
-  TouchableOpacity, Modal, Text } from 'react-native';
-import { SafeAreaView, StackNavigator, TabNavigator } from 'react-navigation';
+import { Button, ScrollView, StatusBar, View, Image,
+  TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { SafeAreaView, StackNavigator, TabNavigator, NavigationActions } from 'react-navigation';
 import Dimensions from 'Dimensions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SampleText from './SampleText';
@@ -139,7 +139,7 @@ class SelectTime extends React.Component {
         <View style={{ marginTop: 'auto', paddingVertical: 20}}>
           <TouchableOpacity
             style={styles.buttonContainer}
-            onPress={() => { this.props.nav.navigate('Home') }}
+            onPress={() => { this.props.nav.navigate('ConfirmTime') }}
           >
             <Text style={styles.buttonText}> SUBMIT </Text>
           </TouchableOpacity>
@@ -170,7 +170,7 @@ class ImagePanner extends React.Component {
 const MyNavScreen = ({ navigation, banner }) => (
   <ScrollView>
     <StatusBar
-      barStyle="dark-content"
+      barStyle="light-content"
     />
     <SafeAreaView forceInset={{ horizontal: 'always' }}>
       <SampleText>{banner}</SampleText>
@@ -234,27 +234,48 @@ const MySettingsScreen = ({ navigation }) => (
   <MyNavScreen banner="Settings Screen" navigation={navigation} />
 );
 
+const TimeConfirmationScreen = ({navigation }) => (
+  <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+    <Ionicons name="ios-checkmark-circle" size={150} color='#006a31' />
+    <Text style={{fontSize: 18, fontWeight: 'bold', textAlign: 'center', paddingHorizontal: 20}}>Your Time Summary has been confirmed!</Text>
+  </View>
+);
+
+const headerBack = (navigation) => (
+  <TouchableOpacity style={{marginRight: 15}} onPress={() => navigation.goBack(null)}>
+    <Ionicons name="ios-arrow-back" style={{paddingHorizontal: 15}} color="#f3f3f3" size={26}/>
+  </TouchableOpacity>
+);
+
 // stack navigator
 const MainTab = StackNavigator({
   Home: {
     screen: MyHomeScreen,
     path: '/',
-    navigationOptions: {
-      title: 'Select Location',
-    },
+    navigationOptions: ({ navigation }) => ({
+      title: `Select parking lot`,
+      headerStyle: styles.header,
+      headerTitleStyle: styles.headerTitle
+    }),
   },
   ParkingLot25: {
     screen: ParkingLot25Screen,
     path: '/parking-lot25',
     navigationOptions: ({ navigation }) => ({
-      title: `Select a Spot`,
+      title: `Select parking spot`,
+      headerLeft: (headerBack(navigation)),
+      headerStyle: styles.header,
+      headerTitleStyle: styles.headerTitle
     }),
   },
   ParkingLot123: {
     screen: ParkingLot123Screen,
     path: '/parking-lot123',
     navigationOptions: ({ navigation }) => ({
-      title: `Select a Spot`,
+      title: `Select parking spot`,
+      headerLeft: (headerBack(navigation)),
+      headerStyle: styles.header,
+      headerTitleStyle: styles.headerTitle
     }),
   },
   SelectTime: {
@@ -262,6 +283,30 @@ const MainTab = StackNavigator({
     path: '/select-time',
     navigationOptions: ({ navigation }) => ({
       title: `Time Summary`,
+      headerLeft: (headerBack(navigation)),
+      headerStyle: styles.header,
+      headerTitleStyle: styles.headerTitle
+    }),
+  },
+  ConfirmTime: {
+    screen: TimeConfirmationScreen,
+    path: '/confirm-time',
+    navigationOptions: ({ navigation }) => ({
+      title: `Confirmed`,
+      headerLeft: (
+        <TouchableOpacity style={{marginRight: 15}} onPress={() => navigation
+          .dispatch(NavigationActions.reset(
+        {
+          index: 0,
+          actions: [
+          NavigationActions.navigate({ routeName: 'Home'})
+          ]
+        }))}>
+          <Text style={{paddingHorizontal: 15, fontWeight: 'bold', color: '#f3f3f3'}}>Close</Text>
+        </TouchableOpacity>
+      ),
+      headerStyle: styles.header,
+      headerTitleStyle: styles.headerTitle
     }),
   },
 });
@@ -314,5 +359,13 @@ const MainApp = TabNavigator(
   }
 );
 
+const styles = StyleSheet.create({
+  header: {
+    backgroundColor: '#006a31'
+  },
+  headerTitle: {
+    color: 'white'
+  },
+});
 
 export default MainApp;
